@@ -1,0 +1,22 @@
+from .base import *
+
+# Production settings
+DEBUG = False
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+
+# Database: PostgreSQL configured via DATABASE_URL
+DATABASES = {
+    'default': env.db('DATABASE_URL')
+}
+
+# Security hardening
+SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_HSTS_SECONDS = env.int('DJANGO_SECURE_HSTS_SECONDS', default=31536000)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

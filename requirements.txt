@@ -1,0 +1,11 @@
+# Core framework
+Django>=5.0,<5.2
+
+# Configuration & environment variables
+django-environ>=0.11.2
+
+# Database drivers (PostgreSQL for production)
+psycopg2-binary>=2.9.9
+
+# Media and file handling
+Pillow>=10.2.0
