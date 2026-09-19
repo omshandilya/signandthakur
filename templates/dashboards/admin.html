@@ -3,21 +3,27 @@
 {% block title %}Admin Dashboard - CA Firm Portal{% endblock %}
 
 {% block content %}
+<!-- Admin Control Banner -->
 <div class="row mb-4">
     <div class="col">
-        <div class="p-4 bg-dark text-white rounded shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="p-4 bg-dark text-white rounded-3 shadow-sm">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                 <div>
-                    <span class="badge bg-warning text-dark mb-2">Executive Firm Control</span>
+                    <span class="badge bg-warning text-dark px-2 py-1 mb-2">
+                        <i class="bi bi-shield-lock me-1"></i>Executive Administration
+                    </span>
                     <h2 class="fw-bold mb-1">Chartered Accountant Workspace</h2>
-                    <p class="text-white-50 mb-0">Overview of firm operations, employee roster, client requests, and filings.</p>
+                    <p class="text-white-50 mb-0">Overview of client service requests, staff workloads, and assignment dispatch.</p>
                 </div>
-                <div class="text-end">
-                    <a href="{% url 'accounts:employee_list' %}" class="btn btn-outline-light btn-sm me-2">
-                        <i class="bi bi-people me-1"></i>Manage Employees
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'accounts:employee_list' %}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-people me-1"></i>Staff Roster
                     </a>
-                    <a href="{% url 'accounts:employee_create' %}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-person-plus me-1"></i>Add Employee
+                    <a href="{% url 'accounts:employee_create' %}" class="btn btn-warning btn-sm text-dark fw-semibold">
+                        <i class="bi bi-person-plus me-1"></i>Add Staff
+                    </a>
+                    <a href="{% url 'catalog:admin_list' %}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-folder-check me-1"></i>Catalog
                     </a>
                 </div>
             </div>
@@ -25,81 +31,311 @@
     </div>
 </div>
 
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
-                        <i class="bi bi-people fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Employees</h6>
-                        <h3 class="fw-bold mb-0">Team</h3>
-                    </div>
+<!-- Metrics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-secondary-subtle text-secondary rounded-3 me-3">
+                    <i class="bi bi-folder2-open fs-3"></i>
                 </div>
-                <div class="mt-3">
-                    <a href="{% url 'accounts:employee_list' %}" class="small text-decoration-none">View employee roster &rarr;</a>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">Total Requests</div>
+                    <h3 class="fw-bold mb-0">{{ total_requests }}</h3>
+                    <small class="text-muted">All firm engagements</small>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3 bg-success-subtle text-success rounded-3 me-3">
-                        <i class="bi bi-check2-all fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Firm Requests</h6>
-                        <h3 class="fw-bold mb-0">Active</h3>
-                    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-danger-subtle text-danger rounded-3 me-3">
+                    <i class="bi bi-bell fs-3"></i>
                 </div>
-                <div class="mt-3">
-                    <span class="small text-muted">All client filings across staff</span>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">New / Unassigned</div>
+                    <h3 class="fw-bold mb-0 text-danger">{{ pending_count }}</h3>
+                    <small class="text-muted">Awaiting assignment</small>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3 bg-warning-subtle text-warning rounded-3 me-3">
-                        <i class="bi bi-person-badge fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Role</h6>
-                        <h3 class="fw-bold mb-0">Admin</h3>
-                    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
+                    <i class="bi bi-gear-wide-connected fs-3"></i>
                 </div>
-                <div class="mt-3">
-                    <span class="small text-muted">Full administrative privileges</span>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">In Progress</div>
+                    <h3 class="fw-bold mb-0 text-primary">{{ assigned_count }}</h3>
+                    <small class="text-muted">Assigned to staff</small>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="p-3 bg-info-subtle text-info rounded-3 me-3">
-                        <i class="bi bi-shield-lock fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Credentials</h6>
-                        <h3 class="fw-bold mb-0">Security</h3>
-                    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-success-subtle text-success rounded-3 me-3">
+                    <i class="bi bi-check-circle-fill fs-3"></i>
                 </div>
-                <div class="mt-3">
-                    <span class="small text-muted">Admin password resets enabled</span>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">Completed</div>
+                    <h3 class="fw-bold mb-0 text-success">{{ completed_count }}</h3>
+                    <small class="text-muted">Successfully fulfilled</small>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Section 1: New Requests (Pending Assignment) with inline assign-to-employee dropdown -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-exclamation-diamond text-danger me-2"></i>New Requests Awaiting Assignment
+            </h5>
+            <small class="text-muted">Assign pending client requests to staff members directly from here</small>
+        </div>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+            {{ new_requests|length }} to assign
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if new_requests %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Request #</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Fee</th>
+                            <th>Submitted On</th>
+                            <th class="text-end pe-4" style="min-width: 280px;">Assign to Employee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in new_requests %}
+                            <tr>
+                                <td class="ps-4 fw-semibold text-secondary">
+                                    <a href="{% url 'requests:detail' req.pk %}" class="text-decoration-none">
+                                        #{{ req.pk }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ req.client.display_name }}</div>
+                                    <small class="text-muted">{{ req.client.email }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ req.service.name }}</span>
+                                </td>
+                                <td class="fw-semibold text-dark">
+                                    ₹{{ req.price_at_request }}
+                                </td>
+                                <td class="text-muted small">
+                                    {{ req.created_at|date:"M d, Y" }}
+                                    <div class="text-muted">{{ req.created_at|date:"h:i A" }}</div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if employees %}
+                                        <form method="post" action="{% url 'requests:assign' req.pk %}" class="d-inline-flex gap-2 align-items-center">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{% url 'dashboards:admin' %}">
+                                            <select name="employee" class="form-select form-select-sm" required style="width: 170px;">
+                                                <option value="" disabled selected>Assign staff...</option>
+                                                {% for emp in employees %}
+                                                    <option value="{{ emp.pk }}">{{ emp.display_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary text-nowrap">
+                                                <i class="bi bi-person-check me-1"></i>Assign
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <div class="text-muted small">
+                                            No staff available. <a href="{% url 'accounts:employee_create' %}">Add Employee</a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Empty State for New Requests -->
+            <div class="text-center py-5 px-3">
+                <div class="p-3 bg-success-subtle text-success rounded-circle d-inline-flex mb-3">
+                    <i class="bi bi-shield-check display-6"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No Unassigned Requests</h5>
+                <p class="text-muted mb-0">All incoming requests have been assigned to your staff accountants.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Section 2: All Requests with Filters by Status -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom py-3">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-list-check text-primary me-2"></i>All Requests
+                </h5>
+                <small class="text-muted">Filter by status to inspect all requests across the firm</small>
+            </div>
+
+            <!-- Status Filter Pills -->
+            <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
+                <a href="?status=" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    All ({{ total_requests }})
+                </a>
+                <a href="?status=PENDING" class="btn {% if status_filter == 'PENDING' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %}">
+                    Pending ({{ pending_count }})
+                </a>
+                <a href="?status=ASSIGNED" class="btn {% if status_filter == 'ASSIGNED' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    Assigned ({{ assigned_count }})
+                </a>
+                <a href="?status=COMPLETED" class="btn {% if status_filter == 'COMPLETED' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    Completed ({{ completed_count }})
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if requests_page.object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Request #</th>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Assigned Staff</th>
+                            <th>Fee</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests_page.object_list %}
+                            <tr>
+                                <td class="ps-4 fw-semibold text-secondary">
+                                    #{{ req.pk }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ req.client.display_name }}</div>
+                                    <small class="text-muted">{{ req.client.email }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ req.service.name }}</span>
+                                </td>
+                                <td>
+                                    {% if req.assigned_to %}
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="bi bi-person me-1"></i>{{ req.assigned_to.display_name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                            Unassigned
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-semibold text-dark">
+                                    ₹{{ req.price_at_request }}
+                                </td>
+                                <td>
+                                    {% if req.status == 'PENDING' %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1">
+                                            <i class="bi bi-hourglass-split me-1"></i>Pending
+                                        </span>
+                                    {% elif req.status == 'ASSIGNED' %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                            <i class="bi bi-gear-wide-connected me-1"></i>Assigned
+                                        </span>
+                                    {% elif req.status == 'COMPLETED' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Completed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ req.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">
+                                    {{ req.created_at|date:"M d, Y" }}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'requests:detail' req.pk %}" class="btn btn-sm btn-outline-secondary text-nowrap">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for All Requests -->
+            {% if requests_page.has_other_pages %}
+                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Page {{ requests_page.number }} of {{ requests_page.paginator.num_pages }}
+                        {% if status_filter %}(Filtered by: {{ status_filter }}){% endif %}
+                    </small>
+                    <nav aria-label="Requests page navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if requests_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ requests_page.previous_page_number }}&status={{ status_filter }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            {% for num in requests_page.paginator.page_range %}
+                                {% if requests_page.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > requests_page.number|add:'-3' and num < requests_page.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}&status={{ status_filter }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if requests_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ requests_page.next_page_number }}&status={{ status_filter }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State for All Requests -->
+            <div class="text-center py-5 px-3">
+                <div class="p-3 bg-light rounded-circle d-inline-flex mb-3">
+                    <i class="bi bi-funnel text-muted display-6"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No Requests Found</h5>
+                <p class="text-muted mb-0">
+                    {% if status_filter %}
+                        No service requests currently match the status "<strong>{{ status_filter }}</strong>".
+                    {% else %}
+                        No service requests have been submitted to the firm yet.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

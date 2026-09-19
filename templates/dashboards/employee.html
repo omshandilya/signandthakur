@@ -3,18 +3,21 @@
 {% block title %}Employee Dashboard - CA Firm Portal{% endblock %}
 
 {% block content %}
+<!-- Welcome Banner -->
 <div class="row mb-4">
     <div class="col">
-        <div class="p-4 bg-white rounded shadow-sm border">
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="p-4 bg-white rounded-3 shadow-sm border">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                 <div>
-                    <span class="badge bg-success mb-2">Staff Portal</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 mb-2">
+                        <i class="bi bi-person-badge me-1"></i>Staff Member Portal
+                    </span>
                     <h2 class="fw-bold mb-1">Welcome, {{ user.display_name }}!</h2>
-                    <p class="text-muted mb-0">View your assigned client requests and upload verified confirmation documents.</p>
+                    <p class="text-muted mb-0">Manage client requests assigned to you, track pending work, and finalize completed filings.</p>
                 </div>
                 <div class="text-end">
                     <span class="badge bg-light text-dark border p-2">
-                        <i class="bi bi-person-badge me-1"></i>Employee Role
+                        <i class="bi bi-calendar3 me-1"></i>{% now "l, F j, Y" %}
                     </span>
                 </div>
             </div>
@@ -22,56 +25,288 @@
     </div>
 </div>
 
-<div class="row g-4">
+<!-- Metrics Cards -->
+<div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="p-3 bg-warning-subtle text-warning rounded-3 me-3">
-                        <i class="bi bi-inbox fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Assigned Tasks</h6>
-                        <h3 class="fw-bold mb-0">0</h3>
-                    </div>
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-warning-subtle text-warning-emphasis rounded-3 me-3">
+                    <i class="bi bi-hourglass-split fs-3"></i>
                 </div>
-                <p class="card-text text-muted small">Client requests currently assigned to you for execution.</p>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">Pending / In-Progress</div>
+                    <h3 class="fw-bold mb-0 text-warning-emphasis">{{ pending_count }}</h3>
+                    <small class="text-muted">Awaiting your action</small>
+                </div>
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
-                        <i class="bi bi-cloud-arrow-up fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Document Uploads</h6>
-                        <h3 class="fw-bold mb-0">0</h3>
-                    </div>
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-success-subtle text-success rounded-3 me-3">
+                    <i class="bi bi-check2-circle fs-3"></i>
                 </div>
-                <p class="card-text text-muted small">Confirmation certificates and filings issued by you.</p>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">Completed</div>
+                    <h3 class="fw-bold mb-0 text-success">{{ completed_count }}</h3>
+                    <small class="text-muted">Finished filings</small>
+                </div>
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="p-3 bg-info-subtle text-info rounded-3 me-3">
-                        <i class="bi bi-shield-check fs-3"></i>
-                    </div>
-                    <div>
-                        <h6 class="text-muted mb-0">Team Member</h6>
-                        <h5 class="fw-bold text-primary mb-0">{{ user.username }}</h5>
-                    </div>
+            <div class="card-body d-flex align-items-center">
+                <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
+                    <i class="bi bi-stack fs-3"></i>
                 </div>
-                <p class="card-text text-muted small">Firm Staff Member | Active Status</p>
+                <div>
+                    <div class="text-muted small text-uppercase fw-semibold">Total Assigned</div>
+                    <h3 class="fw-bold mb-0">{{ total_assigned }}</h3>
+                    <small class="text-muted">Lifetime workload</small>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Section 1: In-Progress / Pending Requests Assigned to Me -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-hourglass-split text-warning me-2"></i>Pending / In-Progress Tasks
+            </h5>
+            <small class="text-muted">Requests assigned to you that are awaiting fulfillment</small>
+        </div>
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+            {{ pending_page_obj.paginator.count }} active
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if pending_page_obj.object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Request #</th>
+                            <th>Client Name</th>
+                            <th>Service</th>
+                            <th>Fee</th>
+                            <th>Assigned Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in pending_page_obj.object_list %}
+                            <tr>
+                                <td class="ps-4 fw-semibold text-secondary">
+                                    #{{ req.pk }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ req.client.display_name }}</div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-envelope me-1"></i>{{ req.client.email }}
+                                        {% if req.client.phone %}
+                                            | <i class="bi bi-telephone me-1"></i>{{ req.client.phone }}
+                                        {% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ req.service.name }}</span>
+                                </td>
+                                <td class="fw-semibold text-dark">
+                                    ₹{{ req.price_at_request }}
+                                </td>
+                                <td class="text-muted small">
+                                    {% if req.assigned_at %}
+                                        {{ req.assigned_at|date:"M d, Y" }}
+                                        <div class="text-muted">{{ req.assigned_at|date:"h:i A" }}</div>
+                                    {% else %}
+                                        {{ req.created_at|date:"M d, Y" }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                        <i class="bi bi-gear-wide-connected me-1"></i>In Progress
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'requests:detail' req.pk %}" class="btn btn-sm btn-primary text-nowrap">
+                                        <i class="bi bi-pencil-square me-1"></i>Work & Complete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Pending -->
+            {% if pending_page_obj.has_other_pages %}
+                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Page {{ pending_page_obj.number }} of {{ pending_page_obj.paginator.num_pages }}
+                    </small>
+                    <nav aria-label="Pending tasks navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if pending_page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?pending_page={{ pending_page_obj.previous_page_number }}&completed_page={{ completed_page_obj.number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            {% for num in pending_page_obj.paginator.page_range %}
+                                {% if pending_page_obj.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > pending_page_obj.number|add:'-3' and num < pending_page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pending_page={{ num }}&completed_page={{ completed_page_obj.number }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pending_page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?pending_page={{ pending_page_obj.next_page_number }}&completed_page={{ completed_page_obj.number }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State for Pending Tasks -->
+            <div class="text-center py-5 px-3">
+                <div class="p-3 bg-success-subtle text-success rounded-circle d-inline-flex mb-3">
+                    <i class="bi bi-check2-circle display-6"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">All Caught Up!</h5>
+                <p class="text-muted mb-0">You have no pending requests assigned to you right now. New requests assigned by the administrator will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Section 2: Completed Requests Assigned to Me -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>Completed Requests
+            </h5>
+            <small class="text-muted">Requests fulfilled and verified with confirmation documents</small>
+        </div>
+        <span class="badge bg-success-subtle text-success border border-success-subtle">
+            {{ completed_page_obj.paginator.count }} completed
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if completed_page_obj.object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Request #</th>
+                            <th>Client Name</th>
+                            <th>Service</th>
+                            <th>Fee</th>
+                            <th>Completed Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in completed_page_obj.object_list %}
+                            <tr>
+                                <td class="ps-4 fw-semibold text-secondary">
+                                    #{{ req.pk }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ req.client.display_name }}</div>
+                                    <small class="text-muted">{{ req.client.email }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ req.service.name }}</span>
+                                </td>
+                                <td class="fw-semibold text-dark">
+                                    ₹{{ req.price_at_request }}
+                                </td>
+                                <td class="text-muted small">
+                                    {{ req.completed_at|date:"M d, Y" }}
+                                    <div class="text-muted">{{ req.completed_at|date:"h:i A" }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Completed
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'requests:detail' req.pk %}" class="btn btn-sm btn-outline-secondary text-nowrap">
+                                        <i class="bi bi-eye me-1"></i>View Record
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Completed -->
+            {% if completed_page_obj.has_other_pages %}
+                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Page {{ completed_page_obj.number }} of {{ completed_page_obj.paginator.num_pages }}
+                    </small>
+                    <nav aria-label="Completed tasks navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            {% if completed_page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?completed_page={{ completed_page_obj.previous_page_number }}&pending_page={{ pending_page_obj.number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            {% for num in completed_page_obj.paginator.page_range %}
+                                {% if completed_page_obj.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > completed_page_obj.number|add:'-3' and num < completed_page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?completed_page={{ num }}&pending_page={{ pending_page_obj.number }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if completed_page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?completed_page={{ completed_page_obj.next_page_number }}&pending_page={{ pending_page_obj.number }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State for Completed Tasks -->
+            <div class="text-center py-5 px-3">
+                <div class="p-3 bg-light rounded-circle d-inline-flex mb-3">
+                    <i class="bi bi-folder2 text-muted display-6"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No Completed Requests Yet</h5>
+                <p class="text-muted mb-0">Completed assignments and filed documents will be archived here.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
