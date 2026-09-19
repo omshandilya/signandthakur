@@ -109,8 +109,26 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Media files (Confirmation documents uploaded by employees)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'
 
-# Default primary key field type
+# Storage configuration (local filesystem in dev, S3 or Cloudinary in production)
+DOCUMENT_STORAGE_BACKEND = env.str(
+    'DOCUMENT_STORAGE_BACKEND',
+    default='django.core.files.storage.FileSystemStorage'
+)
+
+STORAGES = {
+    "default": {
+        "BACKEND": DOCUMENT_STORAGE_BACKEND,
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+# Document validation constraints
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB in bytes
+ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication URLs

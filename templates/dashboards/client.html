@@ -155,7 +155,7 @@
 
                                         {# Download button ONLY appears when request is COMPLETED #}
                                         {% if req.status == 'COMPLETED' %}
-                                            <a href="{% url 'requests:detail' req.pk %}" class="btn btn-sm btn-success text-nowrap" title="Download Completion Document">
+                                            <a href="{% url 'documents:download_request_latest' req.pk %}" class="btn btn-sm btn-success text-nowrap" title="Download Completion Document">
                                                 <i class="bi bi-download me-1"></i>Download
                                             </a>
                                         {% endif %}

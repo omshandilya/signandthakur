@@ -88,9 +88,30 @@ class RequestDetailView(RoleRequiredMixin, View):
             assign_form = AssignRequestForm(
                 employees_qs=get_employees_for_assignment()
             )
+
+        # Upload permission: Assigned employee (or admin) when request is ASSIGNED or COMPLETED
+        can_upload = (
+            (service_request.assigned_to_id == request.user.id or request.user.is_admin_user())
+            and service_request.status in [ServiceRequest.Status.ASSIGNED, ServiceRequest.Status.COMPLETED]
+        )
+
+        from apps.documents.forms import DocumentUploadForm
+        upload_form = DocumentUploadForm() if can_upload else None
+
+        # Download permission: Admin, assigned employee, or owning client if COMPLETED
+        can_download = (
+            request.user.is_admin_user()
+            or service_request.assigned_to_id == request.user.id
+            or (service_request.client_id == request.user.id and service_request.status == ServiceRequest.Status.COMPLETED)
+        )
+
         return render(request, self.template_name, {
             'service_request': service_request,
             'assign_form': assign_form,
+            'upload_form': upload_form,
+            'can_upload': can_upload,
+            'can_download': can_download,
+            'documents': service_request.documents.select_related('uploaded_by').all(),
             'history': service_request.status_history.select_related('changed_by').all(),
         })
 

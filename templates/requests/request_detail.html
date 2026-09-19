@@ -68,20 +68,65 @@
             </div>
         </div>
 
-        <!-- Documents section (placeholder for documents app) -->
+        <!-- Confirmation Documents Section -->
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 border-bottom">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0">
                     <i class="bi bi-file-earmark-check text-success me-2"></i>Confirmation Documents
                 </h6>
+                {% if documents %}
+                    <span class="badge bg-success-subtle text-success">{{ documents|length }} document{{ documents|length|pluralize }}</span>
+                {% endif %}
             </div>
-            <div class="card-body p-4 text-center text-muted">
-                {% if service_request.status == 'COMPLETED' %}
-                    <i class="bi bi-file-earmark-arrow-down display-5 text-success mb-2 d-block"></i>
-                    <p class="mb-0">Documents for this request are available in the Documents section.</p>
+            <div class="card-body p-4">
+                {% if documents %}
+                    <div class="list-group list-group-flush">
+                        {% for doc in documents %}
+                            <div class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0 py-3 gap-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-2 bg-success-subtle text-success rounded-3 me-3">
+                                        <i class="bi bi-file-earmark-arrow-down fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                            {{ doc.original_name }}
+                                            {% if forloop.first %}
+                                                <span class="badge bg-success text-white small" style="font-size: 0.7rem;">Latest</span>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted">
+                                            Size: {{ doc.formatted_size }} &bull;
+                                            Uploaded by {{ doc.uploaded_by.display_name }} &bull;
+                                            {{ doc.created_at|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if can_download %}
+                                        <a href="{% url 'documents:download' doc.pk %}" class="btn btn-sm btn-success text-nowrap">
+                                            <i class="bi bi-download me-1"></i>Download
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Restricted</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% else %}
-                    <i class="bi bi-clock display-5 text-secondary mb-2 d-block"></i>
-                    <p class="mb-0 small">Confirmation documents will be uploaded here by your assigned accountant once the work is complete.</p>
+                    <div class="text-center py-4 text-muted">
+                        {% if service_request.status == 'COMPLETED' %}
+                            <i class="bi bi-file-earmark-x display-5 text-secondary mb-2 d-block"></i>
+                            <p class="mb-0">No confirmation documents were attached to this request.</p>
+                        {% elif service_request.status == 'ASSIGNED' %}
+                            <i class="bi bi-gear-wide-connected display-5 text-primary mb-2 d-block"></i>
+                            <p class="mb-0 fw-semibold text-dark">Work is in progress</p>
+                            <p class="mb-0 small text-muted">Your assigned accountant will upload the final confirmation document here once completed.</p>
+                        {% else %}
+                            <i class="bi bi-clock display-5 text-secondary mb-2 d-block"></i>
+                            <p class="mb-0 small text-muted">Confirmation documents will be uploaded here by the assigned accountant once the work is complete.</p>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -89,6 +134,38 @@
 
     <!-- Sidebar: Actions & Timeline -->
     <div class="col-lg-4">
+
+        <!-- Employee / Admin: Document Upload Form -->
+        {% if can_upload and upload_form %}
+            <div class="card shadow-sm border-0 mb-4 border-top border-4 border-primary">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0 text-primary">
+                        <i class="bi bi-cloud-arrow-up me-2"></i>
+                        {% if service_request.status == 'COMPLETED' %}Upload Document Revision{% else %}Complete Request & Upload{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted small mb-3">
+                        {% if service_request.status == 'ASSIGNED' %}
+                            Upload the completed certificate or tax filing. This will transition the request to <strong>Completed</strong> status and make the document downloadable by the client.
+                        {% else %}
+                            Upload a new revision of the confirmation document. The client will automatically see the latest document.
+                        {% endif %}
+                    </p>
+                    <form method="post" action="{% url 'documents:upload' service_request.pk %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ upload_form.document_file }}
+                            <div class="form-text small">Accepted: PDF, PNG, JPG, WEBP (Max 10 MB).</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if service_request.status == 'COMPLETED' %}Upload Revision{% else %}Upload & Complete Request{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
 
         <!-- Admin: Assign Form -->
         {% if user.is_admin_user and assign_form %}
