@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Requests - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-kanban text-primary me-2"></i>Request Management</h2>
+        <p class="text-muted mb-0">Assign, monitor and track all client service requests across the firm.</p>
+    </div>
+    <a href="{% url 'requests:list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-list-ul me-1"></i>All Requests
+    </a>
+</div>
+
+<!-- Pending Requests -->
+{% if pending_requests %}
+    <h5 class="fw-bold mb-3 text-warning">
+        <i class="bi bi-hourglass-split me-1"></i>Awaiting Assignment
+        <span class="badge bg-warning text-dark ms-2">{{ pending_requests.count }}</span>
+    </h5>
+    <div class="row g-3 mb-4">
+        {% for req in pending_requests %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-warning border-2 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
+                            <small class="text-muted">#{{ req.pk }}</small>
+                        </div>
+                        <h6 class="fw-bold">{{ req.service.name }}</h6>
+                        <div class="small text-muted mb-1"><i class="bi bi-person me-1"></i>{{ req.client.display_name }}</div>
+                        <div class="small text-primary fw-semibold mb-3">₹{{ req.price_at_request|floatformat:2 }}</div>
+                        <div class="small text-muted">Submitted {{ req.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <a href="{% url 'requests:detail' req.pk %}" class="btn btn-warning btn-sm w-100 fw-semibold">
+                            <i class="bi bi-person-check me-1"></i>Assign Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- All Requests Table -->
+<h5 class="fw-bold mb-3"><i class="bi bi-table me-2"></i>All Requests</h5>
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Submitted</th>
+                        <th class="pe-4 text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in all_requests %}
+                    <tr>
+                        <td class="ps-4 text-muted">{{ req.pk }}</td>
+                        <td>{{ req.client.display_name }}</td>
+                        <td>{{ req.service.name }}</td>
+                        <td class="text-primary fw-semibold">₹{{ req.price_at_request|floatformat:2 }}</td>
+                        <td>
+                            {% if req.status == 'PENDING' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
+                            {% elif req.status == 'ASSIGNED' %}
+                                <span class="badge bg-info-subtle text-info border border-info-subtle">Assigned</span>
+                            {% else %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ req.assigned_to.display_name|default:"—" }}</td>
+                        <td class="text-muted small">{{ req.created_at|date:"M d, Y" }}</td>
+                        <td class="pe-4 text-end">
+                            <a href="{% url 'requests:detail' req.pk %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-eye me-1"></i>View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No requests yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

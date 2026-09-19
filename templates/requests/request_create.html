@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Request a Service - CA Firm Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-send-fill fs-4 me-2"></i>
+                    <div>
+                        <h4 class="mb-0 fw-bold">Request a Service</h4>
+                        <small class="text-white-50">Submit a new CA service request</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="id_service" class="form-label fw-semibold">Select Service</label>
+                        <select name="service" id="id_service" class="form-select" required>
+                            <option value="">— Choose a service —</option>
+                            {% for svc in active_services %}
+                                <option value="{{ svc.pk }}" {% if service and service.pk == svc.pk %}selected{% endif %}>
+                                    {{ svc.name }} — ₹{{ svc.price|floatformat:2 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% if service %}
+                        <!-- Pre-selected service info card -->
+                        <div class="p-3 bg-light border rounded-3 mb-4">
+                            <div class="fw-bold mb-1">{{ service.name }}</div>
+                            <div class="text-primary fw-semibold mb-2">₹{{ service.price|floatformat:2 }}</div>
+                            {% if service.description %}
+                                <p class="small text-muted mb-2">{{ service.description }}</p>
+                            {% endif %}
+                            {% if service.document_requirements.exists %}
+                                <div class="small fw-semibold text-secondary mb-1">
+                                    <i class="bi bi-card-checklist me-1"></i>Documents to keep ready:
+                                </div>
+                                <ul class="list-unstyled small mb-0">
+                                    {% for req in service.document_requirements.all %}
+                                        <li><i class="bi bi-check-circle-fill text-success me-1"></i>{{ req.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="alert alert-info border-0 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Once submitted, our team will review and assign your request to an accountant. You will be able to track status here.
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <a href="{% url 'catalog:list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Back to Services
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-semibold">
+                            <i class="bi bi-send-fill me-1"></i>Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
