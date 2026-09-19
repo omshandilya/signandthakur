@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_create %}Add New Service{% else %}Edit Service: {{ service.name }}{% endif %} - Admin Portal
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white py-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi {% if is_create %}bi-plus-circle-fill{% else %}bi-pencil-square{% endif %} fs-4 me-2"></i>
+                    <div>
+                        <h4 class="mb-0 fw-bold">
+                            {% if is_create %}Add New Service{% else %}Edit Service: {{ service.name }}{% endif %}
+                        </h4>
+                        <small class="text-white-50">Configure service offering and required document checklist</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if formset.non_form_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in formset.non_form_errors %}
+                            <div><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Service Details Section -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Service Details
+                    </h5>
+
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">Service Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Explain deliverables, scope, and expected turn-around time.</div>
+                    </div>
+
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.price.id_for_label }}" class="form-label fw-semibold">Price (INR ₹)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.price }}
+                            </div>
+                            {% if form.price.errors %}
+                                <div class="text-danger small mt-1">{{ form.price.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check mt-md-4">
+                                {{ form.is_active }}
+                                <label class="form-check-label fw-semibold ms-1" for="{{ form.is_active.id_for_label }}">
+                                    Active (visible in client catalog)
+                                </label>
+                            </div>
+                            {% if form.is_active.errors %}
+                                <div class="text-danger small mt-1">{{ form.is_active.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Required Documents Checklist Section -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3 mt-4">
+                        <i class="bi bi-card-checklist text-primary me-2"></i>Required Documents (Checklist for Clients)
+                    </h5>
+                    <p class="text-muted small mb-3">
+                        List documents the client should have ready (e.g., PAN Card, GST Certificate, 6 Months Bank Statement).
+                        Clients do not upload these; they are for information only.
+                    </p>
+
+                    {{ formset.management_form }}
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Document Description / Name</th>
+                                    {% if not is_create %}
+                                        <th style="width: 100px;" class="text-center">Delete</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req_form in formset %}
+                                    <tr>
+                                        <td class="text-muted fw-semibold" style="width: 50px;">
+                                            {{ forloop.counter }}
+                                            {% for hidden in req_form.hidden_fields %}
+                                                {{ hidden }}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {{ req_form.name }}
+                                            {% if req_form.name.errors %}
+                                                <div class="text-danger small mt-1">{{ req_form.name.errors.0 }}</div>
+                                            {% endif %}
+                                        </td>
+                                        {% if not is_create %}
+                                            <td class="text-center">
+                                                {% if req_form.instance.pk %}
+                                                    <div class="form-check d-inline-block">
+                                                        {{ req_form.DELETE }}
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-2 border-top">
+                        <a href="{% url 'catalog:admin_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if is_create %}Create Service{% else %}Save Changes{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

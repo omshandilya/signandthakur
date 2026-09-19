@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Services & Catalog - CA Firm Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-briefcase-fill text-primary me-2"></i>Chartered Accounting Services
+        </h2>
+        <p class="text-muted mb-0">
+            Browse our comprehensive suite of professional accounting, taxation, and advisory services.
+        </p>
+    </div>
+    {% if user.is_authenticated and user.is_admin_user %}
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+            <a href="{% url 'catalog:admin_list' %}" class="btn btn-outline-dark">
+                <i class="bi bi-gear-fill me-1"></i>Manage Catalog
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Informational Alert about Documents -->
+<div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+    <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+    <div class="small">
+        <strong>Document Checklist Notice:</strong> The documents listed below are for your preparation only.
+        Clients do not need to upload anything on the portal. Our staff will review your request and issue the final certified confirmation documents once complete.
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for service in services %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 d-flex flex-column">
+                <div class="card-body p-4 flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold text-dark mb-0">{{ service.name }}</h5>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6">
+                            ₹{{ service.price|floatformat:2 }}
+                        </span>
+                    </div>
+
+                    {% if service.description %}
+                        <p class="card-text text-muted small mb-4 mt-2">
+                            {{ service.description|linebreaksbr }}
+                        </p>
+                    {% else %}
+                        <p class="card-text text-muted small mb-4 mt-2 fst-italic">
+                            Professional CA firm service offering.
+                        </p>
+                    {% endif %}
+
+                    <!-- Required Documents Checklist -->
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="fw-semibold text-secondary small mb-2 d-flex align-items-center">
+                            <i class="bi bi-card-checklist me-1 text-primary"></i>
+                            Documents You'll Need (For Reference):
+                        </div>
+                        <ul class="list-unstyled mb-0 small">
+                            {% for req in service.document_requirements.all %}
+                                <li class="py-1 text-dark d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 0.85rem;"></i>
+                                    <span>{{ req.name }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="text-muted fst-italic py-1">
+                                    <i class="bi bi-dash me-1"></i>No special documents required in advance.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 p-4 pt-0">
+                    {% if user.is_authenticated %}
+                        <a href="/requests/create/?service={{ service.id }}" class="btn btn-primary w-100 fw-semibold">
+                            <i class="bi bi-send-fill me-1"></i>Request This Service
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={% url 'catalog:list' %}" class="btn btn-outline-primary w-100 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign in to Request
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="card shadow-sm border-0 p-5">
+                <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+                <h4 class="text-muted">No services currently available</h4>
+                <p class="text-muted small">Please check back shortly or contact the office directly.</p>
+                {% if user.is_authenticated and user.is_admin_user %}
+                    <div class="mt-3">
+                        <a href="{% url 'catalog:admin_create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Add the First Service
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
