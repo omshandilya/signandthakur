@@ -26,8 +26,17 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Dashboard</a>
+                            <a class="nav-link" href="{% url 'dashboards:index' %}">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
                         </li>
+                        {% if user.is_admin_user %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:employee_list' %}">
+                                    <i class="bi bi-people me-1"></i>Employees
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
 

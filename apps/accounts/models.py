@@ -27,3 +27,11 @@ class User(AbstractUser):
 
     def is_admin_user(self):
         return self.role == self.Role.ADMIN or self.is_superuser
+
+    @property
+    def display_name(self):
+        full = self.get_full_name().strip()
+        return full if full else self.username
+
+    def __str__(self):
+        return f"{self.display_name} ({self.get_role_display()})"

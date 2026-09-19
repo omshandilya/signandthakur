@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - CA Firm Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <div class="p-4 bg-dark text-white rounded shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-warning text-dark mb-2">Executive Firm Control</span>
+                    <h2 class="fw-bold mb-1">Chartered Accountant Workspace</h2>
+                    <p class="text-white-50 mb-0">Overview of firm operations, employee roster, client requests, and filings.</p>
+                </div>
+                <div class="text-end">
+                    <a href="{% url 'accounts:employee_list' %}" class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-people me-1"></i>Manage Employees
+                    </a>
+                    <a href="{% url 'accounts:employee_create' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-person-plus me-1"></i>Add Employee
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
+                        <i class="bi bi-people fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Employees</h6>
+                        <h3 class="fw-bold mb-0">Team</h3>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'accounts:employee_list' %}" class="small text-decoration-none">View employee roster &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-success-subtle text-success rounded-3 me-3">
+                        <i class="bi bi-check2-all fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Firm Requests</h6>
+                        <h3 class="fw-bold mb-0">Active</h3>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="small text-muted">All client filings across staff</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-warning-subtle text-warning rounded-3 me-3">
+                        <i class="bi bi-person-badge fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Role</h6>
+                        <h3 class="fw-bold mb-0">Admin</h3>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="small text-muted">Full administrative privileges</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-info-subtle text-info rounded-3 me-3">
+                        <i class="bi bi-shield-lock fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Credentials</h6>
+                        <h3 class="fw-bold mb-0">Security</h3>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="small text-muted">Admin password resets enabled</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

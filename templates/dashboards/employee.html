@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard - CA Firm Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <div class="p-4 bg-white rounded shadow-sm border">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-success mb-2">Staff Portal</span>
+                    <h2 class="fw-bold mb-1">Welcome, {{ user.display_name }}!</h2>
+                    <p class="text-muted mb-0">View your assigned client requests and upload verified confirmation documents.</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark border p-2">
+                        <i class="bi bi-person-badge me-1"></i>Employee Role
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 bg-warning-subtle text-warning rounded-3 me-3">
+                        <i class="bi bi-inbox fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Assigned Tasks</h6>
+                        <h3 class="fw-bold mb-0">0</h3>
+                    </div>
+                </div>
+                <p class="card-text text-muted small">Client requests currently assigned to you for execution.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-3 me-3">
+                        <i class="bi bi-cloud-arrow-up fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Document Uploads</h6>
+                        <h3 class="fw-bold mb-0">0</h3>
+                    </div>
+                </div>
+                <p class="card-text text-muted small">Confirmation certificates and filings issued by you.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 bg-info-subtle text-info rounded-3 me-3">
+                        <i class="bi bi-shield-check fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-0">Team Member</h6>
+                        <h5 class="fw-bold text-primary mb-0">{{ user.username }}</h5>
+                    </div>
+                </div>
+                <p class="card-text text-muted small">Firm Staff Member | Active Status</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
