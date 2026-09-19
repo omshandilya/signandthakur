@@ -175,6 +175,12 @@ class AdminPasswordResetView(RoleRequiredMixin, View):
 
 
 def get_user_id_queryset():
-    """Helper to obtain user queryset for get_object_or_404."""
+    """Return users that the admin can reset passwords for (non-admin users only).
+
+    Admins are not manageable through this endpoint — they must use the
+    Django shell or admin site. This prevents an admin from inadvertently
+    locking out another admin via URL manipulation.
+    """
     from django.contrib.auth import get_user_model
-    return get_user_model().objects.all()
+    User = get_user_model()
+    return User.objects.exclude(role=User.Role.ADMIN)

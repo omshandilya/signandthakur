@@ -52,7 +52,7 @@ class DocumentUploadView(RoleRequiredMixin, View):
                     messages.error(request, error)
 
         next_url = request.POST.get('next')
-        if next_url:
+        if next_url and next_url.startswith('/'):
             return redirect(next_url)
         return redirect('requests:detail', pk=request_pk)
 
@@ -85,7 +85,16 @@ class DocumentDownloadView(LoginRequiredMixin, View):
 
 
 class LatestDocumentDownloadView(LoginRequiredMixin, View):
-    """Download the latest confirmation document for a specific service request."""
+    """Download the latest confirmation document for a specific service request.
+
+    Access rules:
+    - Anonymous users are redirected to login.
+    - Client owning the request: allowed only when request is COMPLETED.
+    - Assigned employee: always allowed.
+    - Admin: always allowed.
+    - Everyone else (other clients, other employees): 404 (not 403, to prevent
+      confirming the existence of another user's request).
+    """
 
     def get(self, request, request_pk):
         service_request = get_object_or_404(ServiceRequest, pk=request_pk)

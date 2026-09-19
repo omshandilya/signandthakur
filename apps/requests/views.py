@@ -144,7 +144,7 @@ class AdminAssignRequestView(RoleRequiredMixin, View):
             messages.error(request, "Please select a valid employee.")
 
         next_url = request.POST.get('next')
-        if next_url:
+        if next_url and next_url.startswith('/'):
             return redirect(next_url)
         return redirect('requests:detail', pk=pk)
 
